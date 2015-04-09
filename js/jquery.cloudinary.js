@@ -863,29 +863,31 @@
 
     if (initializing) {
       this.bind("fileuploaddone", function(e, data) {
-        if (data.result.error) return;
-        data.result.path = ["v", data.result.version, "/", data.result.public_id,
-                            data.result.format ? "." + data.result.format : ""].join("");
+        if (data.result) {
+          if (data.result.error) return;
+          data.result.path = ["v", data.result.version, "/", data.result.public_id,
+                              data.result.format ? "." + data.result.format : ""].join("");
 
-        if (data.cloudinaryField && data.form.length > 0) {
-          var upload_info = [data.result.resource_type, data.result.type, data.result.path].join("/") + "#" + data.result.signature;
-          var multiple = $(e.target).prop("multiple");
-          var add_field = function() {
-            $('<input/>').attr({type: "hidden", name: data.cloudinaryField}).val(upload_info).appendTo(data.form);
-          };
+          if (data.cloudinaryField && data.form.length > 0) {
+            var upload_info = [data.result.resource_type, data.result.type, data.result.path].join("/") + "#" + data.result.signature;
+            var multiple = $(e.target).prop("multiple");
+            var add_field = function() {
+              $('<input/>').attr({type: "hidden", name: data.cloudinaryField}).val(upload_info).appendTo(data.form);
+            };
 
-          if (multiple) {
-            add_field();
-          } else {
-            var field = $(data.form).find('input[name="' + data.cloudinaryField + '"]');
-            if (field.length > 0) {
-              field.val(upload_info);
-            } else {
+            if (multiple) {
               add_field();
+            } else {
+              var field = $(data.form).find('input[name="' + data.cloudinaryField + '"]');
+              if (field.length > 0) {
+                  field.val(upload_info);
+                } else {
+                  add_field();
+                }
+              }
             }
           }
-        }
-        $(e.target).trigger('cloudinarydone', data);
+          $(e.target).trigger('cloudinarydone', data);
       });
       this.bind("fileuploadsend", function(e, data) {
         // add a common unique ID to all chunks of the same uploaded file
